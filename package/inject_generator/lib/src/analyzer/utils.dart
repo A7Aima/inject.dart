@@ -26,14 +26,14 @@ InjectedType getInjectedType(DartType type, {SymbolPath qualifier}) {
   if (type is FunctionType) {
     if (type.parameters.isNotEmpty) {
       builderContext.log.severe(
-          type.element,
+          type.aliasElement,
           'Only no-arg typedefs are supported, '
           'and no-arg typedefs are treated as providers of the return type. ');
       throw new ArgumentError();
     }
     if (type.returnType.isDynamic) {
       builderContext.log.severe(
-          type.element,
+          type.aliasElement,
           'Cannot create a provider of type dynamic. '
           'Your function type did not include a return type.');
       throw new ArgumentError();
