@@ -103,13 +103,12 @@ class BuilderLogger {
       SomeParsedLibraryResult someParsedLibrary;
       try {
         someParsedLibrary =
-            element.library.session.getParsedLibraryByElement2(element.library);
+            element.library.session.getParsedLibraryByElement(element.library);
       } on AnalysisException {
         // suppress exceptions from the AnalysisSession, such as
         // `InconsistentAnalysisException`
       }
-      if (someParsedLibrary is ParsedLibraryResult &&
-          someParsedLibrary.state == ResultState.VALID) {
+      if (someParsedLibrary is ParsedLibraryResult) {
         elementDeclaration = someParsedLibrary.getElementDeclaration(element);
       }
     }
