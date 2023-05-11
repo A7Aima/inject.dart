@@ -4,10 +4,10 @@ description: Dev-time dependency for package:inject.
 homepage: https://pub.dartlang.org/packages/inject
 
 environment:
-    sdk: ">=2.10.2 <3.0.0"
+    sdk: ">=2.12.2 <3.0.0"
 
 dependencies:
-    analyzer: ^3.3.1
+    analyzer: ^5.2.0
     build: ^2.2.1
     code_builder: ^4.1.0
     collection: ^1.16.0
