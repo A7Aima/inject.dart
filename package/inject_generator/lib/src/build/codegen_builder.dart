@@ -317,6 +317,12 @@ class _InjectorBuilder {
 
   void _generateCreateMethod(ResolvedDependency? dependency) {
     final key = dependency?.lookupKey;
+
+    if (dependency == null) {
+      // Already generated.
+      return;
+    }
+
     if (creatorMethods.containsKey(key)) {
       // Already generated.
       return;
@@ -335,7 +341,7 @@ class _InjectorBuilder {
     final method = new MethodBuilder()
       ..name = _creatorMethodName(key)
       ..returns = _referenceForKey(key)
-      ..body = _createDependency(dependency!).expression.code
+      ..body = _createDependency(dependency).expression.code
       ..lambda = true;
     creatorMethods[key] = method;
   }
