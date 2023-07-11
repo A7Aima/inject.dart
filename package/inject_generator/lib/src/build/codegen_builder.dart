@@ -187,7 +187,7 @@ class _InjectorBuilder {
       ..fields.addAll(fields.map((b) => b.build()))
       ..constructors.add(constructor.build())
       ..methods.add(_generateInjectorCreatorMethod())
-      ..methods.addAll(creatorMethods.values.map((b) => b!.build()))
+      ..methods.addAll(creatorMethods.values.map((b) => b?.build() ?? Method.returnsVoid()))
       ..methods.addAll(injectorProviders.map((b) => b.build())));
   }
 
