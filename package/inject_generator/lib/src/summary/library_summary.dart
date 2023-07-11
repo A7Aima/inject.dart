@@ -10,7 +10,7 @@ part of inject.src.summary;
 /// A library summary generally corresponds to a ".dart" file.
 class LibrarySummary {
   /// Creates a [LibrarySummary] by parsing the .inject.summary [json].
-  static LibrarySummary parseJson(Map<String, Object>? json) {
+  static LibrarySummary parseJson(Map<String, dynamic> json) {
     if (json == null) {
       throw new ArgumentError.notNull('json');
     }
