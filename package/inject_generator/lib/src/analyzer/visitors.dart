@@ -5,9 +5,10 @@
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/visitor.dart';
-import 'package:inject_generator/src/analyzer/utils.dart';
-import 'package:inject_generator/src/context.dart';
-import 'package:inject_generator/src/source/symbol_path.dart';
+
+import '../context.dart';
+import '../source/symbol_path.dart';
+import 'utils.dart';
 
 /// Scans a resolved [LibraryElement] looking for metadata-annotated members.
 ///
@@ -115,14 +116,14 @@ class _LibraryVisitor extends RecursiveElementVisitor<Null> {
 }
 
 List<SymbolPath> _extractModules(ClassElement clazz) {
-  ElementAnnotation annotation = getInjectorAnnotation(clazz);
-  List<DartObject> modules =
-      annotation.computeConstantValue().getField('modules').toListValue();
+  ElementAnnotation? annotation = getInjectorAnnotation(clazz);
+  List<DartObject>? modules =
+      annotation?.computeConstantValue()?.getField('modules')?.toListValue();
   if (modules == null) {
     return const <SymbolPath>[];
   }
   return modules
-      .map((DartObject obj) => getSymbolPath(obj.toTypeValue().element))
+      .map((DartObject obj) => getSymbolPath(obj.toTypeValue()!.element!))
       .toList();
 }
 
@@ -139,11 +140,15 @@ abstract class InjectClassVisitor {
   bool get isForInjector => _isForInjector;
 
   /// Call to start visiting [clazz].
-  void visitClass(ClassElement clazz) {
-    for (var supertype
-        in clazz.allSupertypes.where((t) => !t.isDartCoreObject)) {
-      new _AnnotatedClassVisitor(this).visitClassElement(supertype.element);
+  void visitClass(ClassElement? clazz) {
+    if (clazz == null) {
+      return;
     }
+    // * need to checj 10th July 2023
+    // for (var supertype
+    //     in clazz.allSupertypes.where((t) => !t.isDartCoreObject)) {
+    //   new _AnnotatedClassVisitor(this).visitClassElement(supertype.element);
+    // }
     new _AnnotatedClassVisitor(this).visitClassElement(clazz);
   }
 
@@ -161,7 +166,7 @@ abstract class InjectClassVisitor {
     MethodElement method,
     bool singleton,
     bool asynchronous, {
-    SymbolPath qualifier,
+    SymbolPath? qualifier,
   });
 
   /// Called when a getter is annotated with `@provide`.
@@ -197,7 +202,7 @@ class _AnnotatedClassVisitor extends GeneralizingElementVisitor<Null> {
 
   @override
   Null visitFieldElement(FieldElement field) {
-    if (_isProvider(field.getter)) {
+    if (_isProvider(field.getter!.declaration)) {
       bool singleton = hasSingletonAnnotation(field);
       bool asynchronous = hasAsynchronousAnnotation(field);
       if (asynchronous) {

@@ -8,12 +8,13 @@ import 'dart:convert';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:build/build.dart';
-import 'package:inject_generator/src/analyzer/utils.dart';
-import 'package:inject_generator/src/analyzer/visitors.dart';
-import 'package:inject_generator/src/build/abstract_builder.dart';
-import 'package:inject_generator/src/context.dart';
-import 'package:inject_generator/src/source/symbol_path.dart';
-import 'package:inject_generator/src/summary.dart';
+
+import '../analyzer/utils.dart';
+import '../analyzer/visitors.dart';
+import '../context.dart';
+import '../source/symbol_path.dart';
+import '../summary.dart';
+import 'abstract_builder.dart';
 
 /// Extracts metadata about modules and injectors from Dart libraries.
 class InjectSummaryBuilder extends AbstractInjectBuilder {
@@ -119,7 +120,7 @@ class _SummaryBuilderVisitor extends InjectLibraryVisitor {
       );
     }
 
-    ProviderSummary constructorSummary;
+    ProviderSummary? constructorSummary;
     if (annotatedConstructors.length == 1) {
       // Use the explicitly annotated constructor.
       constructorSummary = _createConstructorProviderSummary(
@@ -193,7 +194,7 @@ class _ProviderSummaryVisitor extends InjectClassVisitor {
     MethodElement method,
     bool singleton,
     bool asynchronous, {
-    SymbolPath qualifier,
+    SymbolPath? qualifier,
   }) {
     if (isForInjector && !method.isAbstract) {
       builderContext.log.severe(
@@ -218,15 +219,15 @@ class _ProviderSummaryVisitor extends InjectClassVisitor {
       return;
     }
 
-    if (!isForInjector && returnType is FunctionType) {
-      builderContext.log.severe(
-          returnType.element,
-          'Modules are not allowed to provide a function type () -> Type. '
-          'The inject library prohibits this to avoid confusion '
-          'with injecting providers of injectable types. '
-          'Your provider method will not be used.');
-      return;
-    }
+    // if (!isForInjector && returnType is FunctionType) {
+    //   builderContext.log.severe(
+    //       returnType,
+    //       'Modules are not allowed to provide a function type () -> Type. '
+    //       'The inject library prohibits this to avoid confusion '
+    //       'with injecting providers of injectable types. '
+    //       'Your provider method will not be used.');
+    //   return;
+    // }
 
     var summary = new ProviderSummary(
       getInjectedType(returnType, qualifier: qualifier),
@@ -246,9 +247,9 @@ class _ProviderSummaryVisitor extends InjectClassVisitor {
               return null;
             }
 
-            if (p.type.isDynamic) {
+            if (p.type is DynamicType) {
               builderContext.log.severe(
-                  p.enclosingElement,
+                  p.enclosingElement!,
                   'Parameter named `${p.name}` resolved to dynamic. This can '
                   'happen when the return type is not specified, when it is '
                   'specified as `dynamic`, or when the return type failed to '
@@ -268,12 +269,12 @@ class _ProviderSummaryVisitor extends InjectClassVisitor {
 
   @override
   void visitProvideGetter(FieldElement field, bool singleton) {
-    if (!_checkReturnType(field.getter, field.getter.returnType.element)) {
+    if (!_checkReturnType(field.getter, field.getter?.returnType.element)) {
       return;
     }
-    var returnType = field.getter.returnType;
+    var returnType = field.getter?.returnType;
     var summary = new ProviderSummary(
-      getInjectedType(returnType),
+      getInjectedType(returnType!),
       field.name,
       ProviderKind.getter,
       singleton: singleton,
@@ -283,10 +284,10 @@ class _ProviderSummaryVisitor extends InjectClassVisitor {
   }
 
   bool _checkReturnType(
-      ExecutableElement executableElement, Element returnTypeElement) {
-    if (returnTypeElement.kind == ElementKind.DYNAMIC) {
+      ExecutableElement? executableElement, Element? returnTypeElement) {
+    if (returnTypeElement!.kind == ElementKind.DYNAMIC) {
       builderContext.log.severe(
-        executableElement,
+        executableElement!,
         'provider return type resolved to dynamic. This can happen when the '
         'return type is not specified, when it is specified as `dynamic`, or '
         'when the return type failed to resolve to a proper type due to a '
@@ -320,12 +321,12 @@ ProviderSummary _createConstructorProviderSummary(
               // Extract @someQualifier as the qualifier.
               final clazz = element.enclosingElement;
               final formal = clazz.getField(p.name);
-              if (hasQualifier(formal)) {
+              if (hasQualifier(formal!)) {
                 qualifier = extractQualifier(formal);
               }
             }
 
-            if (p.type.isDynamic) {
+            if (p.type is DynamicType) {
               builderContext.log.severe(
                 p,
                 'a constructor argument type resolved to dynamic. This can '

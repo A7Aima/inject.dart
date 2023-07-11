@@ -98,12 +98,12 @@ class BuilderLogger {
 
   String _constructMessage(Element element, String message) {
     // <TRANSITIONAL_API>
-    ElementDeclarationResult elementDeclaration;
+    ElementDeclarationResult? elementDeclaration;
     if (element.kind != ElementKind.DYNAMIC) {
-      SomeParsedLibraryResult someParsedLibrary;
+      SomeParsedLibraryResult? someParsedLibrary;
       try {
-        someParsedLibrary =
-            element.library.session.getParsedLibraryByElement(element.library);
+        someParsedLibrary = element.library?.session
+            .getParsedLibraryByElement(element.library!);
       } on AnalysisException {
         // suppress exceptions from the AnalysisSession, such as
         // `InconsistentAnalysisException`
@@ -120,9 +120,10 @@ class BuilderLogger {
       sourceLocation = 'at unknown source location:';
       source = '.';
     } else {
-      var offset = elementDeclaration.node.offset;
-      var location = elementDeclaration.parsedUnit.lineInfo.getLocation(offset);
-      var code = elementDeclaration.node.toSource();
+      var offset = elementDeclaration?.node.offset;
+      var location =
+          elementDeclaration?.parsedUnit?.lineInfo.getLocation(offset!);
+      var code = elementDeclaration?.node.toSource();
       sourceLocation = 'at $location:';
       source = ':\n\n$code';
     }

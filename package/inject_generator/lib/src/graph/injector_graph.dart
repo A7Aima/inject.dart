@@ -6,7 +6,7 @@ part of inject.src.graph;
 /// A provider defined on an `@Injector` class.
 class InjectorProvider {
   /// The type this provides.
-  final InjectedType injectedType;
+  final InjectedType? injectedType;
 
   /// The name of the method or getter to `@override`.
   final String methodName;
@@ -45,14 +45,14 @@ class DependencyProvidedByModule extends ResolvedDependency {
   final String methodName;
 
   DependencyProvidedByModule._(
-      LookupKey lookupKey,
+      LookupKey? lookupKey,
       bool singleton,
       bool asynchronous,
       List<InjectedType> dependencies,
       this.moduleClass,
       this.methodName)
       : super(
-          lookupKey,
+          lookupKey!,
           singleton,
           asynchronous,
           dependencies,
@@ -68,7 +68,7 @@ class DependencyProvidedByInjectable extends ResolvedDependency {
     InjectableSummary summary,
   )   : this.summary = summary,
         super(
-          new LookupKey(summary.clazz),
+          new LookupKey(summary.clazz, qualifier: null),
           summary.constructor.isSingleton,
           false,
           summary.constructor.dependencies,

@@ -19,8 +19,8 @@ class InjectorSummary {
   /// Constructor.
   ///
   /// [clazz], [modules] and [providers] must not be `null` or empty.
-  factory InjectorSummary(SymbolPath clazz, List<SymbolPath> modules,
-      List<ProviderSummary> providers) {
+  factory InjectorSummary(SymbolPath? clazz, List<SymbolPath>? modules,
+      List<ProviderSummary>? providers) {
     if (clazz == null) {
       throw new ArgumentError.notNull('clazz');
     }

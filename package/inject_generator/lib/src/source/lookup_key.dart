@@ -2,8 +2,9 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'package:inject_generator/src/source/symbol_path.dart';
 import 'package:quiver/core.dart';
+
+import 'symbol_path.dart';
 
 /// A representation of a key in the dependency injection graph.
 ///
@@ -17,7 +18,7 @@ class LookupKey {
   /// Optional qualifier for the type.
   final Optional<SymbolPath> qualifier;
 
-  LookupKey(this.root, {SymbolPath qualifier})
+  LookupKey(this.root, {required SymbolPath? qualifier})
       : this.qualifier = new Optional.fromNullable(qualifier);
 
   /// Returns a new instance from the JSON encoding of an instance.

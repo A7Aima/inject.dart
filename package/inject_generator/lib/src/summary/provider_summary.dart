@@ -24,7 +24,7 @@ final _providerKindNames = new BiMap<ProviderKind, String>()
 
 /// Converts provider [name] to the corresponding `enum` reference.
 ProviderKind providerKindFromName(String name) {
-  ProviderKind kind = _providerKindNames.inverse[name];
+  ProviderKind? kind = _providerKindNames.inverse[name];
 
   if (kind == null) {
     throw new ArgumentError.value(name, 'name', 'Invalid provider kind name');
@@ -37,7 +37,7 @@ ProviderKind providerKindFromName(String name) {
 ///
 /// See also [providerKindFromName].
 String provideKindName(ProviderKind kind) {
-  String name = _providerKindNames[kind];
+  String? name = _providerKindNames[kind];
 
   if (name == null) {
     throw new ArgumentError.value(kind, 'kind', 'Unrecognized provider kind');
@@ -56,7 +56,7 @@ class ProviderSummary {
   final ProviderKind kind;
 
   /// Type of the instance that will be returned.
-  final InjectedType injectedType;
+  final InjectedType? injectedType;
 
   /// Whether or not this provider provides a singleton.
   final bool isSingleton;
@@ -70,12 +70,12 @@ class ProviderSummary {
   /// Create a new summary of a provider that returns an instance of
   /// [injectedType].
   factory ProviderSummary(
-    InjectedType injectedType,
-    String name,
-    ProviderKind kind, {
-    List<InjectedType> dependencies: const [],
-    bool singleton: false,
-    bool asynchronous: false,
+    InjectedType? injectedType,
+    String? name,
+    ProviderKind? kind, {
+    List<InjectedType?>? dependencies = const [],
+    bool? singleton = false,
+    bool asynchronous = false,
   }) {
     if (injectedType == null) {
       throw new ArgumentError.notNull('lookupKey');

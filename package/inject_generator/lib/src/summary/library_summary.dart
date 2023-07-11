@@ -10,7 +10,7 @@ part of inject.src.summary;
 /// A library summary generally corresponds to a ".dart" file.
 class LibrarySummary {
   /// Creates a [LibrarySummary] by parsing the .inject.summary [json].
-  static LibrarySummary parseJson(Map<String, Object> json) {
+  static LibrarySummary parseJson(Map<String, Object>? json) {
     if (json == null) {
       throw new ArgumentError.notNull('json');
     }
@@ -47,10 +47,10 @@ class LibrarySummary {
   /// Constructor.
   ///
   /// [assetUri], [injectors] and [modules] must not be `null`.
-  factory LibrarySummary(Uri assetUri,
-      {List<InjectorSummary> injectors: const [],
-      List<ModuleSummary> modules: const [],
-      List<InjectableSummary> injectables: const []}) {
+  factory LibrarySummary(Uri? assetUri,
+      {List<InjectorSummary>? injectors = const [],
+      List<ModuleSummary>? modules = const [],
+      List<InjectableSummary>? injectables = const []}) {
     if (assetUri == null) {
       throw new ArgumentError.notNull('assetUri');
     }

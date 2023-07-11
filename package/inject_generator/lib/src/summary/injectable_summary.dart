@@ -16,7 +16,7 @@ class InjectableSummary {
   ///
   /// [clazz] is the path to the injectable class. [constructor] carries summary
   /// about the constructor annotated with `@Provide()`.
-  factory InjectableSummary(SymbolPath clazz, ProviderSummary constructor) {
+  factory InjectableSummary(SymbolPath? clazz, ProviderSummary? constructor) {
     if (clazz == null) {
       throw new ArgumentError.notNull('clazz');
     }

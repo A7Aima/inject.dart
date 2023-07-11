@@ -2,26 +2,29 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+// ignore_for_file: invalid_use_of_visible_for_overriding_member, deprecated_member_use
+
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:build/build.dart';
 import 'package:code_builder/code_builder.dart';
 import 'package:dart_style/dart_style.dart';
-import 'package:inject_generator/src/build/abstract_builder.dart';
-import 'package:inject_generator/src/context.dart';
-import 'package:inject_generator/src/graph.dart';
-import 'package:inject_generator/src/source/injected_type.dart';
-import 'package:inject_generator/src/source/lookup_key.dart';
-import 'package:inject_generator/src/source/symbol_path.dart';
-import 'package:inject_generator/src/summary.dart';
 import 'package:meta/meta.dart' hide literal;
+
+import '../context.dart';
+import '../graph.dart';
+import '../source/injected_type.dart';
+import '../source/lookup_key.dart';
+import '../source/symbol_path.dart';
+import '../summary.dart';
+import 'abstract_builder.dart';
 
 /// Generates code for a dependency injection-aware library.
 class InjectCodegenBuilder extends AbstractInjectBuilder {
   final bool _useScoping;
 
-  const InjectCodegenBuilder({bool useScoping: true})
+  const InjectCodegenBuilder({bool useScoping = true})
       : _useScoping = useScoping;
 
   @override
@@ -94,8 +97,8 @@ class _Variable {
   final Reference type;
 
   const _Variable({
-    @required this.name,
-    @required this.type,
+    required this.name,
+    required this.type,
   });
 }
 
@@ -126,7 +129,7 @@ class _InjectorBuilder {
   /// Dependencies already visited during graph traversal.
   final _visitedPreInstantiations = new Set<LookupKey>();
 
-  final creatorMethods = <LookupKey, MethodBuilder>{};
+  final creatorMethods = <LookupKey, MethodBuilder?>{};
   final moduleVariables = <SymbolPath, _Variable>{};
 
   /// Provider methods on the generated injector class.
@@ -184,7 +187,7 @@ class _InjectorBuilder {
       ..fields.addAll(fields.map((b) => b.build()))
       ..constructors.add(constructor.build())
       ..methods.add(_generateInjectorCreatorMethod())
-      ..methods.addAll(creatorMethods.values.map((b) => b.build()))
+      ..methods.addAll(creatorMethods.values.map((b) => b!.build()))
       ..methods.addAll(injectorProviders.map((b) => b.build())));
   }
 
@@ -203,8 +206,8 @@ class _InjectorBuilder {
         final moduleVariable = moduleVariables[moduleSymbol];
         injectorCreator.requiredParameters.add(new Parameter(
           (b) => b
-            ..name = moduleVariable.name
-            ..type = moduleVariable.type,
+            ..name = moduleVariable?.name ?? ""
+            ..type = moduleVariable?.type,
         ));
       } else {
         final moduleType = _reference(moduleSymbol);
@@ -230,14 +233,14 @@ class _InjectorBuilder {
   void _generateInjectorProviders() {
     // Generate injector providers.
     graph.providers.forEach((provider) {
-      final returnType = _referenceForType(provider.injectedType);
+      final returnType = _referenceForType(provider.injectedType!);
       final method = new MethodBuilder()
         ..name = provider.methodName
         ..returns = returnType
         ..type = provider.isGetter ? MethodType.getter : null
         ..lambda = true
         ..body = _invokeCreateMethod(
-                dependency: provider.injectedType,
+                dependency: provider.injectedType!,
                 scope: 'this',
                 requestedBy: summary.clazz)
             .expression
@@ -271,9 +274,9 @@ class _InjectorBuilder {
   // _create method if necessary; OR, returns a method reference if [dependency]
   // is a provider.
   Expression _invokeCreateMethod({
-    @required InjectedType dependency,
-    @required String scope,
-    @required SymbolPath requestedBy,
+    required InjectedType dependency,
+    required String scope,
+    required SymbolPath requestedBy,
   }) {
     if (!graph.mergedDependencies.containsKey(dependency.lookupKey)) {
       logUnresolvedDependency(
@@ -312,10 +315,13 @@ class _InjectorBuilder {
     return refer('${prefix}${_creatorMethodName(key)}');
   }
 
-  void _generateCreateMethod(ResolvedDependency dependency) {
-    final key = dependency.lookupKey;
+  void _generateCreateMethod(ResolvedDependency? dependency) {
+    final key = dependency?.lookupKey;
     if (creatorMethods.containsKey(key)) {
       // Already generated.
+      return;
+    }
+    if (key == null) {
       return;
     }
 
@@ -329,7 +335,7 @@ class _InjectorBuilder {
     final method = new MethodBuilder()
       ..name = _creatorMethodName(key)
       ..returns = _referenceForKey(key)
-      ..body = _createDependency(dependency).expression.code
+      ..body = _createDependency(dependency!).expression.code
       ..lambda = true;
     creatorMethods[key] = method;
   }
@@ -384,13 +390,13 @@ class _InjectorBuilder {
         dependency.summary.clazz.symbol,
         dependency.summary.clazz.toDartUri(relativeTo: libraryUri).toString(),
       );
-      var constructorName = dependency.summary.constructor.name;
+      String? constructorName = dependency.summary.constructor.name;
       if (constructorName.isEmpty) {
         // TODO(https://github.com/dart-lang/code_builder/issues/83)
         constructorName = null;
       }
       dependencyExpression = type.newInstanceNamed(
-        constructorName,
+        constructorName!,
         dependency.dependencies
             .map((d) => _invokeCreateMethod(
                 dependency: d,
@@ -406,8 +412,11 @@ class _InjectorBuilder {
     return dependencyExpression;
   }
 
-  void _preInstantiateDependency(ResolvedDependency dep) {
-    if (_visitedPreInstantiations.contains(dep.lookupKey)) {
+  void _preInstantiateDependency(ResolvedDependency? dep) {
+    if (_visitedPreInstantiations.contains(dep?.lookupKey)) {
+      return;
+    }
+    if (dep == null) {
       return;
     }
     _visitedPreInstantiations.add(dep.lookupKey);

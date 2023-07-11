@@ -13,7 +13,7 @@ class ModuleSummary {
   final List<ProviderSummary> providers;
 
   /// Create a new summary of a module [clazz] of [providers].
-  factory ModuleSummary(SymbolPath clazz, List<ProviderSummary> providers) {
+  factory ModuleSummary(SymbolPath? clazz, List<ProviderSummary>? providers) {
     if (clazz == null) {
       throw new ArgumentError.notNull('clazz');
     }
