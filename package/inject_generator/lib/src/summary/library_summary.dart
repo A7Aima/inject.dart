@@ -10,20 +10,20 @@ part of inject.src.summary;
 /// A library summary generally corresponds to a ".dart" file.
 class LibrarySummary {
   /// Creates a [LibrarySummary] by parsing the .inject.summary [json].
-  static LibrarySummary parseJson(Map<String, Object>? json) {
+  static LibrarySummary parseJson(dynamic json) {
     if (json == null) {
       throw new ArgumentError.notNull('json');
     }
     var assetUri = Uri.parse(json['asset'] as String);
-    Map<String, Object> summary = json['summary'] as Map<String, Object>;
+    Map<String, dynamic> summary = json['summary'] as Map<String, dynamic>;
     List<InjectorSummary> injectors = (summary['injector'] as List<dynamic>)
-        .map((e) => _injectorFromJson(assetUri, e as Map<String, Object>))
+        .map((e) => _injectorFromJson(assetUri, e as Map<String, dynamic>))
         .toList();
     var modules = (summary['module'] as List<dynamic>)
-        .map((e) => _moduleFromJson(assetUri, e as Map<String, Object>))
+        .map((e) => _moduleFromJson(assetUri, e as Map<String, dynamic>))
         .toList();
     var injectables = (summary['injectable'] as List<dynamic>)
-        .map((e) => _injectableFromJson(assetUri, e as Map<String, Object>))
+        .map((e) => _injectableFromJson(assetUri, e as Map<String, dynamic>))
         .toList();
     return new LibrarySummary(assetUri,
         injectors: injectors, modules: modules, injectables: injectables);
