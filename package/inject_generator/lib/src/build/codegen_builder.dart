@@ -201,23 +201,29 @@ class _InjectorBuilder {
       ..returns = returnType
       ..static = true
       ..modifier = MethodModifier.async;
-    for (final moduleSymbol in graph.includeModules) {
-      if (moduleVariables.containsKey(moduleSymbol)) {
-        final moduleVariable = moduleVariables[moduleSymbol];
-        injectorCreator.requiredParameters.add(new Parameter(
-          (b) => b
-            ..name = moduleVariable?.name ?? ""
-            ..type = moduleVariable?.type,
-        ));
-      } else {
-        final moduleType = _reference(moduleSymbol);
-        builderContext.rawLogger.warning(
-          'Unused module in ${summary.clazz.symbol}: ${moduleSymbol.symbol}',
-        );
-        injectorCreator.requiredParameters.add(new Parameter((b) => b
-          ..name = '_' * _unusedCounter++
-          ..type = moduleType));
+    try {
+      for (final moduleSymbol in graph.includeModules) {
+        if (moduleVariables.containsKey(moduleSymbol)) {
+          final moduleVariable = moduleVariables[moduleSymbol];
+          injectorCreator.requiredParameters.add(new Parameter(
+            (b) => b
+              ..name = moduleVariable?.name ?? ""
+              ..type = moduleVariable?.type ?? null,
+          ));
+        } else {
+          final moduleType = _reference(moduleSymbol);
+          builderContext.rawLogger.warning(
+            'Unused module in ${summary.clazz.symbol}: ${moduleSymbol.symbol}',
+          );
+          injectorCreator.requiredParameters.add(new Parameter((b) => b
+            ..name = '_' * _unusedCounter++
+            ..type = moduleType));
+        }
       }
+    } catch (e) {
+      builderContext.rawLogger.warning(
+        'Found The Error',
+      );
     }
     final initExpression = concreteInjectorType.newInstanceNamed(
       '_',
